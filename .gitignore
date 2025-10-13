@@ -35,3 +35,6 @@ obj/
 # =========================================
 node_modules/
 wwwroot/lib/
+
+# Archivos de configuración con credenciales
+ApiHerramientaWeb/appsettings.json
