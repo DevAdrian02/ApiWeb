@@ -1,0 +1,37 @@
+# =========================================
+# .NET y Visual Studio
+# =========================================
+bin/
+obj/
+.vs/
+*.user
+*.suo
+*.cache
+*.log
+
+# =========================================
+# Archivos compilados / temporales
+# =========================================
+*.dll
+*.exe
+*.pdb
+*.tmp
+*.bak
+*.dat
+*.pak
+*.zip
+*.7z
+
+# =========================================
+# Chrome / Playwright / Puppeteer embebidos
+# =========================================
+**/Chrome/
+**/ChromeHeadlessShell/
+**/chrome-win64/
+**/chrome-headless-shell-win64/
+
+# =========================================
+# Otros
+# =========================================
+node_modules/
+wwwroot/lib/

@@ -1,0 +1,8 @@
+@ApiHerramientaWeb_HostAddress = http://localhost:5191
+
+GET {{ApiHerramientaWeb_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
+
+

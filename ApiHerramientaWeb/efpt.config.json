@@ -1,0 +1,370 @@
+﻿{
+   "CodeGenerationMode": 4,
+   "ContextClassName": "CVGEntities",
+   "ContextNamespace": null,
+   "FilterSchemas": false,
+   "IncludeConnectionString": false,
+   "MinimumProductVersion": "2.6.0",
+   "ModelNamespace": null,
+   "OutputContextPath": null,
+   "OutputPath": "Entity",
+   "PreserveCasingWithRegex": true,
+   "ProjectRootNamespace": "ModeloPrincipal",
+   "Schemas": null,
+   "SelectedHandlebarsLanguage": 2,
+   "SelectedToBeGenerated": 0,
+   "T4TemplatePath": null,
+   "Tables": [
+      {
+         "Name": "[CAJ].[MSTCANALPAGO]",
+         "ObjectType": 0
+      },
+      {
+         "Name": "[CLI].[DETCNT]",
+         "ObjectType": 0
+      },
+      {
+         "Name": "[CLI].[MSTCLI]",
+         "ObjectType": 0
+      },
+      {
+         "Name": "[CLI].[MSTCNT]",
+         "ObjectType": 0
+      },
+      {
+         "Name": "[CLI].[MSTSUC]",
+         "ObjectType": 0
+      },
+      {
+         "Name": "[CLI].[MSTTIPUBIGEO]",
+         "ObjectType": 0
+      },
+      {
+         "Name": "[CLI].[MSTUBIGEO]",
+         "ObjectType": 0
+      },
+      {
+         "Name": "[CLI].[MSTVENTGEO]",
+         "ObjectType": 0
+      },
+      {
+         "Name": "[CLI].[RELAGEUBI]",
+         "ObjectType": 0
+      },
+      {
+         "Name": "[CNF].[CATSERVICIOPERFIL]",
+         "ObjectType": 0
+      },
+      {
+         "Name": "[CNF].[MSTINTEGRACION]",
+         "ObjectType": 0
+      },
+      {
+         "Name": "[CNF].[MSTOBJ]",
+         "ObjectType": 0
+      },
+      {
+         "Name": "[CNF].[MSTROL]",
+         "ObjectType": 0
+      },
+      {
+         "Name": "[CNF].[MSTUSR]",
+         "ObjectType": 0
+      },
+      {
+         "Name": "[CNF].[RELROLOBJ]",
+         "ObjectType": 0
+      },
+      {
+         "Name": "[CNF].[RELUSRROL]",
+         "ObjectType": 0
+      },
+      {
+         "Name": "[CNF].[RELUSRSUC]",
+         "ObjectType": 0
+      },
+      {
+         "Name": "[CNT].[MSTORIGEN]",
+         "ObjectType": 0
+      },
+      {
+         "Name": "[FAC].[CATMotivosAnulacion]",
+         "ObjectType": 0
+      },
+      {
+         "Name": "[FAC].[DATAINVERSEGUROS]",
+         "ObjectType": 0
+      },
+      {
+         "Name": "[FAC].[DETFAC]",
+         "ObjectType": 0
+      },
+      {
+         "Name": "[FAC].[DETPLAVTA]",
+         "ObjectType": 0
+      },
+      {
+         "Name": "[FAC].[DETPLAVTAORD]",
+         "ObjectType": 0
+      },
+      {
+         "Name": "[FAC].[DETPLAVTASRV]",
+         "ObjectType": 0
+      },
+      {
+         "Name": "[FAC].[DETPREFAC]",
+         "ObjectType": 0
+      },
+      {
+         "Name": "[FAC].[DETSRVORD]",
+         "ObjectType": 0
+      },
+      {
+         "Name": "[FAC].[FACNOGENERADA]",
+         "ObjectType": 0
+      },
+      {
+         "Name": "[FAC].[FacturasCobradas]",
+         "ObjectType": 0
+      },
+      {
+         "Name": "[FAC].[FacturasPagosClientes]",
+         "ObjectType": 0
+      },
+      {
+         "Name": "[FAC].[HISGENFAC]",
+         "ObjectType": 0
+      },
+      {
+         "Name": "[FAC].[HSTFACXTR]",
+         "ObjectType": 0
+      },
+      {
+         "Name": "[FAC].[INVERSEGUROS]",
+         "ObjectType": 0
+      },
+      {
+         "Name": "[FAC].[LastCheckedConsecutive]",
+         "ObjectType": 0
+      },
+      {
+         "Name": "[FAC].[LogEnvioFacturaDigital]",
+         "ObjectType": 0
+      },
+      {
+         "Name": "[FAC].[MSTAPEFAC]",
+         "ObjectType": 0
+      },
+      {
+         "Name": "[FAC].[MSTCLSNCRAUT]",
+         "ObjectType": 0
+      },
+      {
+         "Name": "[FAC].[MSTCLSSRVPRD]",
+         "ObjectType": 0
+      },
+      {
+         "Name": "[FAC].[MSTDESACTIVFAC]",
+         "ObjectType": 0
+      },
+      {
+         "Name": "[FAC].[MSTFAC]",
+         "ObjectType": 0
+      },
+      {
+         "Name": "[FAC].[MSTFACXTR]",
+         "ObjectType": 0
+      },
+      {
+         "Name": "[FAC].[MSTFORMATO]",
+         "ObjectType": 0
+      },
+      {
+         "Name": "[FAC].[MSTLIBFAC]",
+         "ObjectType": 0
+      },
+      {
+         "Name": "[FAC].[MSTLSTPRE]",
+         "ObjectType": 0
+      },
+      {
+         "Name": "[FAC].[MSTNCRAUT]",
+         "ObjectType": 0
+      },
+      {
+         "Name": "[FAC].[MSTPLAVTA]",
+         "ObjectType": 0
+      },
+      {
+         "Name": "[FAC].[MSTPREFAC]",
+         "ObjectType": 0
+      },
+      {
+         "Name": "[FAC].[MSTPROMO]",
+         "ObjectType": 0
+      },
+      {
+         "Name": "[FAC].[MSTSRVPERFLOW]",
+         "ObjectType": 0
+      },
+      {
+         "Name": "[FAC].[MSTSRVPRD]",
+         "ObjectType": 0
+      },
+      {
+         "Name": "[FAC].[MSTTIPSRVPRD]",
+         "ObjectType": 0
+      },
+      {
+         "Name": "[FAC].[MSTVALFAC]",
+         "ObjectType": 0
+      },
+      {
+         "Name": "[FAC].[PARFACTUR]",
+         "ObjectType": 0
+      },
+      {
+         "Name": "[FAC].[Resultado_Anulacion_Mora]",
+         "ObjectType": 0
+      },
+      {
+         "Name": "[FAC].[SUSCRIPCIONES_FACTURA_DIGITAL]",
+         "ObjectType": 0
+      },
+      {
+         "Name": "[FAC].[tblCatalogoComisionVta]",
+         "ObjectType": 0
+      },
+      {
+         "Name": "[INV].[DETMOVIMIENTO]",
+         "ObjectType": 0
+      },
+      {
+         "Name": "[INV].[MSTMOVIMIENTO]",
+         "ObjectType": 0
+      },
+      {
+         "Name": "[ORD].[AUDITACTWEB]",
+         "ObjectType": 0
+      },
+      {
+         "Name": "[ORD].[CATINTEGRACIONPERFIL]",
+         "ObjectType": 0
+      },
+      {
+         "Name": "[ORD].[MSTCUADRILLA]",
+         "ObjectType": 0
+      },
+      {
+         "Name": "[ORD].[MSTEQUIPO]",
+         "ObjectType": 0
+      },
+      {
+         "Name": "[ORD].[MSTMARCA]",
+         "ObjectType": 0
+      },
+      {
+         "Name": "[ORD].[MSTMODELO]",
+         "ObjectType": 0
+      },
+      {
+         "Name": "[ORD].[MSTSPDIDO]",
+         "ObjectType": 0
+      },
+      {
+         "Name": "[ORD].[MSTTEC]",
+         "ObjectType": 0
+      },
+      {
+         "Name": "[WEB].[AUDUSOP]",
+         "ObjectType": 0
+      },
+      {
+         "Name": "[WEB].[LOGUS]",
+         "ObjectType": 0
+      },
+      {
+         "Name": "[CNT].[vwContratoActivar]",
+         "ObjectType": 3
+      },
+      {
+         "Name": "[dbo].[vwContratosServiciosWS]",
+         "ObjectType": 3
+      },
+      {
+         "Name": "[dbo].[vwContratosWS]",
+         "ObjectType": 3
+      },
+      {
+         "Name": "[dbo].[vwFacturasServiciosWS]",
+         "ObjectType": 3
+      },
+      {
+         "Name": "[dbo].[vwFacturasWS]",
+         "ObjectType": 3
+      },
+      {
+         "Name": "[dbo].[vwServiciosWS]",
+         "ObjectType": 3
+      },
+      {
+         "Name": "[FAC].[vwHistorialFactura]",
+         "ObjectType": 3
+      },
+      {
+         "Name": "[INV].[vw_MovimientosEquipos]",
+         "ObjectType": 3
+      },
+      {
+         "Name": "[INV].[vwMovimientosEquiposListado]",
+         "ObjectType": 3
+      },
+      {
+         "Name": "[ORD].[vwNuevaSuspensiones]",
+         "ObjectType": 3
+      },
+      {
+         "Name": "[ORD].[vwObtenerEquipoContrato]",
+         "ObjectType": 3
+      },
+      {
+         "Name": "[ORD].[vwPlanificaciones]",
+         "ObjectType": 3
+      },
+      {
+         "Name": "[CLI].[spObtenerContratosDisponibles]",
+         "ObjectType": 1
+      },
+      {
+         "Name": "[CXC].[spObtenerFacturasColector]",
+         "ObjectType": 1
+      }
+   ],
+   "UiHint": null,
+   "UncountableWords": null,
+   "UseAsyncStoredProcedureCalls": true,
+   "UseBoolPropertiesWithoutDefaultSql": false,
+   "UseDatabaseNames": false,
+   "UseDatabaseNamesForRoutines": true,
+   "UseDateOnlyTimeOnly": true,
+   "UseDbContextSplitting": false,
+   "UseDecimalDataAnnotationForSprocResult": true,
+   "UseFluentApiOnly": true,
+   "UseHandleBars": false,
+   "UseHierarchyId": false,
+   "UseInflector": true,
+   "UseInternalAccessModifiersForSprocsAndFunctions": false,
+   "UseLegacyPluralizer": false,
+   "UseManyToManyEntity": false,
+   "UseNoDefaultConstructor": false,
+   "UseNoNavigations": false,
+   "UseNoObjectFilter": false,
+   "UseNodaTime": false,
+   "UseNullableReferences": false,
+   "UsePrefixNavigationNaming": false,
+   "UseSchemaFolders": false,
+   "UseSchemaNamespaces": false,
+   "UseSpatial": false,
+   "UseT4": false,
+   "UseT4Split": false
+}
