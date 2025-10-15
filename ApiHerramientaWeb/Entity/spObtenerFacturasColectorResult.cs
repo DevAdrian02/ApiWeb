@@ -10,8 +10,8 @@ namespace ModeloPrincipal.Entity
     {
         [StringLength(17)]
         public string IDUnico { get; set; }
-        public int IDContrato { get; set; }
-        public int NoContrato { get; set; }
+        public int? IDContrato { get; set; }
+        public int? NoContrato { get; set; }
         [StringLength(50)]
         public string EMAIL1 { get; set; }
         [StringLength(50)]
@@ -24,7 +24,7 @@ namespace ModeloPrincipal.Entity
         public string EntregadoPor { get; set; }
         [StringLength(15)]
         public string NumeroFaja { get; set; }
-        public int IDSucursal { get; set; }
+        public int? IDSucursal { get; set; }
         [StringLength(50)]
         public string Sucursal { get; set; }
         [StringLength(17)]
@@ -32,7 +32,7 @@ namespace ModeloPrincipal.Entity
         [Column("SALDO", TypeName = "decimal(18,2)")]
         public decimal SALDO { get; set; }
         public string EstadoPagoFactura { get; set; }
-        public int IDEUBIGEO { get; set; }
+        public int? IDEUBIGEO { get; set; }
         [StringLength(50)]
         public string Zona { get; set; }
         public DateOnly? FECHA { get; set; }
@@ -41,6 +41,8 @@ namespace ModeloPrincipal.Entity
         public string NOMFAC { get; set; }
         [StringLength(50)]
         public string ESTADO_CONTRATO { get; set; }
-        public bool SuspensionCompleta { get; set; }
+        [StringLength(100)]
+        public string DescripcionServicios { get; set; }
+        public bool? SuspensionCompleta { get; set; }
     }
 }

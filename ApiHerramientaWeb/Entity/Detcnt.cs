@@ -320,5 +320,7 @@ public partial class Detcnt
 
     public virtual Mstsrvprd Mstsrvprd { get; set; }
 
+    public virtual ICollection<Mstticket> Msttickets { get; set; } = new List<Mstticket>();
+
     public virtual ICollection<Mstvalfac> Mstvalfacs { get; set; } = new List<Mstvalfac>();
 }

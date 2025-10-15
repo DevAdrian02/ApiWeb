@@ -30,5 +30,9 @@ public partial class Mstmovimiento
 
     public DateTime? FechaRegistro { get; set; }
 
+    public string MovimientoId { get; set; }
+
+    public int? IdticketAsociado { get; set; }
+
     public virtual ICollection<Detmovimiento> Detmovimientos { get; set; } = new List<Detmovimiento>();
 }

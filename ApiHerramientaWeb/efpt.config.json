@@ -276,6 +276,10 @@
          "ObjectType": 0
       },
       {
+         "Name": "[ORD].[MSTTICKET]",
+         "ObjectType": 0
+      },
+      {
          "Name": "[WEB].[AUDUSOP]",
          "ObjectType": 0
       },

@@ -119,6 +119,8 @@ public partial class CVGEntities : DbContext
 
     public virtual DbSet<Msttec> Msttecs { get; set; }
 
+    public virtual DbSet<Mstticket> Msttickets { get; set; }
+
     public virtual DbSet<Msttipsrvprd> Msttipsrvprds { get; set; }
 
     public virtual DbSet<Msttipubigeo> Msttipubigeos { get; set; }
@@ -188,8 +190,7 @@ public partial class CVGEntities : DbContext
                 .HasDefaultValueSql("(suser_sname())")
                 .HasColumnName("APPNAME");
             entity.Property(e => e.Codref)
-                .IsRequired()
-                .HasMaxLength(50)
+                .IsUnicode(false)
                 .HasColumnName("CODREF");
             entity.Property(e => e.Codusrcre)
                 .IsRequired()
@@ -1627,6 +1628,10 @@ public partial class CVGEntities : DbContext
                 .HasNoKey()
                 .ToTable("LogEnvioFacturaDigital", "FAC", tb => tb.HasComment("Tabla para el registro del envio de los avisos de cobro o factura digital correspondientes al mes en curso."));
 
+            entity.HasIndex(e => new { e.Idfactura, e.Correo }, "UX_LogEnvio_Unico")
+                .IsUnique()
+                .HasFilter("([Procesada]=(0))");
+
             entity.Property(e => e.Cliente)
                 .IsRequired()
                 .HasMaxLength(100);
@@ -1805,6 +1810,8 @@ public partial class CVGEntities : DbContext
             entity.HasIndex(e => new { e.Idecli, e.Idecatcli }, "MSTCLI_IDX_3010");
 
             entity.HasIndex(e => e.Idecia, "NCI_MSTCLI_InfoCliente");
+
+            entity.HasIndex(e => e.Idecatcli, "NCI_MSTCLI_Telefonos");
 
             entity.HasIndex(e => e.Ideszn, "NCI_MstCli_IDSubzona");
 
@@ -2290,6 +2297,8 @@ public partial class CVGEntities : DbContext
 
             entity.HasIndex(e => e.Codestfin, "NCI_MSTCNT_CodEstFin");
 
+            entity.HasIndex(e => new { e.Idesuc, e.Idedep, e.Idemun, e.Idezon, e.Ideszn }, "NCI_MSTCNT_ContratoDiaPago");
+
             entity.HasIndex(e => e.Codestfin, "NCI_MSTCNT_EstadoFin");
 
             entity.HasIndex(e => e.Idecia, "NCI_MSTCNT_IDECIA");
@@ -2697,6 +2706,8 @@ public partial class CVGEntities : DbContext
 
             entity.HasIndex(e => new { e.Idecnt, e.Idefac, e.Codsts, e.Flgtipfac, e.Stdfac }, "IX_MSTFAC_IDECNT_IDEFAC");
 
+            entity.HasIndex(e => e.Idecnt, "IX_MSTFAC_Solvencia").HasFilter("([STDFAC]=(2) AND [FLGTIPFAC]=(1) AND [CODSTS]<>'C')");
+
             entity.HasIndex(e => new { e.Codsts, e.Srefac }, "MSTFAC_IDX_2000");
 
             entity.HasIndex(e => e.Idecnt, "MSTFAC_IDX_3000");
@@ -2732,6 +2743,8 @@ public partial class CVGEntities : DbContext
             entity.HasIndex(e => new { e.Codsts, e.Flgtipfac, e.Fchini }, "NCI_MSTFAC_StsTipFacFchIni");
 
             entity.HasIndex(e => new { e.Flgtipfac, e.Stdfac }, "NCI_MSTFAC_TipFacEstado");
+
+            entity.HasIndex(e => e.Flgtipfac, "NCI_MSTFAC_TipoFactura");
 
             entity.Property(e => e.Idefac)
                 .HasComment("Id Interno")
@@ -3386,7 +3399,9 @@ public partial class CVGEntities : DbContext
             entity.Property(e => e.FechaRegistro)
                 .HasDefaultValueSql("(getdate())")
                 .HasColumnType("datetime");
+            entity.Property(e => e.IdticketAsociado).HasColumnName("IDTicketAsociado");
             entity.Property(e => e.IdtipoMovimiento).HasColumnName("IDTipoMovimiento");
+            entity.Property(e => e.MovimientoId).HasMaxLength(255);
             entity.Property(e => e.Observaciones)
                 .HasMaxLength(350)
                 .IsUnicode(false);
@@ -4323,9 +4338,7 @@ public partial class CVGEntities : DbContext
             entity.HasIndex(e => new { e.Ideclssrvprd, e.Idesrvprd }, "UX_MSTSRVPRD_CLSSRV_SRV").IsUnique();
 
             entity.Property(e => e.Idesrvprd).HasColumnName("IDESRVPRD");
-            entity.Property(e => e.Activo)
-                .HasDefaultValue(true)
-                .HasColumnName("ACTIVO");
+            entity.Property(e => e.Activo).HasDefaultValue(true);
             entity.Property(e => e.Codsrvprd)
                 .IsRequired()
                 .HasMaxLength(10)
@@ -4407,9 +4420,7 @@ public partial class CVGEntities : DbContext
                 .HasDefaultValue(1)
                 .HasComment("Tipo de Item. 1=Producto, 2=Servicio, 4=Grupo, 8=Cargo, 16=Descuento")
                 .HasColumnName("IDETIPSRVPRD");
-            entity.Property(e => e.Mbps)
-                .HasColumnType("decimal(4, 1)")
-                .HasColumnName("MBPS");
+            entity.Property(e => e.Mbps).HasColumnType("decimal(4, 1)");
             entity.Property(e => e.Modfch)
                 .HasDefaultValueSql("(getdate())")
                 .HasComment("Fecha de modificación del registro")
@@ -4473,14 +4484,14 @@ public partial class CVGEntities : DbContext
                 .HasComment("Porcentaje del impuesto del valor agregado")
                 .HasColumnType("numeric(18, 2)")
                 .HasColumnName("PRCENT");
-            entity.Property(e => e.Prebasefor)
+            entity.Property(e => e.PreBaseFor)
                 .HasDefaultValue(0m)
-                .HasColumnType("decimal(18, 4)")
-                .HasColumnName("PREBASEFOR");
-            entity.Property(e => e.Prebaseloc)
+                .HasColumnType("decimal(18, 4)");
+            entity.Property(e => e.PreBaseLoc)
                 .HasDefaultValue(0m)
-                .HasColumnType("decimal(18, 4)")
-                .HasColumnName("PREBASELOC");
+                .HasColumnType("decimal(18, 4)");
+            entity.Property(e => e.Prioridad).HasDefaultValue(0);
+            entity.Property(e => e.ProvisionaCpe).HasDefaultValue(false);
 
             entity.HasOne(d => d.IdeclssrvprdNavigation).WithMany(p => p.Mstsrvprds)
                 .HasForeignKey(d => d.Ideclssrvprd)
@@ -4742,6 +4753,214 @@ public partial class CVGEntities : DbContext
                 .HasComment("Telefono del Tecnico")
                 .UseCollation("Modern_Spanish_CI_AS")
                 .HasColumnName("TELTEC");
+        });
+
+        modelBuilder.Entity<Mstticket>(entity =>
+        {
+            entity.HasKey(e => e.Ideticket);
+
+            entity.ToTable("MSTTICKET", "ORD", tb =>
+                {
+                    tb.HasComment("Maestro de Ticket (trouble ticket)");
+                    tb.HasTrigger("MSTTICKET_INSERT");
+                    tb.HasTrigger("MSTTICKET_UPDATE");
+                    tb.HasTrigger("tgActualizarAtencionTicket");
+                    tb.HasTrigger("tgActualizarFechaVencimiento");
+                });
+
+            entity.HasIndex(e => e.Idecnt, "IDX_MSTTICKET_00020");
+
+            entity.HasIndex(e => e.Ideticket, "IX_MSTTICKET");
+
+            entity.HasIndex(e => e.Fchemi, "NCI_MSTTICKET_FchEmi");
+
+            entity.HasIndex(e => e.Fcheje, "NCI_MSTTICKET_FechaEje");
+
+            entity.HasIndex(e => new { e.Ideclsord, e.Fcheje }, "NCI_MSTTICKET_FechaEjeClase");
+
+            entity.HasIndex(e => new { e.Idecia, e.Idedetcnt }, "NCI_MSTTICLET_IdeCia_IdeDetCnt");
+
+            entity.HasIndex(e => new { e.Codesttkt, e.Ideclsord }, "NCI_MstTicket_ClaseEstado");
+
+            entity.Property(e => e.Ideticket)
+                .HasComment("Id Interno del Ticket")
+                .HasColumnName("IDETICKET");
+            entity.Property(e => e.Codesttkt)
+                .IsRequired()
+                .HasMaxLength(5)
+                .IsUnicode(false)
+                .IsFixedLength()
+                .HasComment("Código del estado del ticket")
+                .UseCollation("Modern_Spanish_CI_AS")
+                .HasColumnName("CODESTTKT");
+            entity.Property(e => e.Crefch)
+                .HasDefaultValueSql("(getdate())")
+                .HasComment("Fecha de creación del registro")
+                .HasColumnType("datetime")
+                .HasColumnName("CREFCH");
+            entity.Property(e => e.Crehsn)
+                .IsRequired()
+                .HasMaxLength(75)
+                .IsUnicode(false)
+                .HasDefaultValueSql("(host_name())")
+                .HasComment("Host Name de PC de Creación")
+                .UseCollation("Modern_Spanish_CI_AS")
+                .HasColumnName("CREHSN");
+            entity.Property(e => e.Creips)
+                .IsRequired()
+                .HasMaxLength(50)
+                .IsUnicode(false)
+                .HasDefaultValue("000.000.000.000")
+                .HasComment("IP de PC Creación")
+                .UseCollation("Modern_Spanish_CI_AS")
+                .HasColumnName("CREIPS");
+            entity.Property(e => e.Creusr)
+                .IsRequired()
+                .HasMaxLength(50)
+                .IsUnicode(false)
+                .HasDefaultValueSql("(suser_sname())")
+                .HasComment("Usuario que creo el registro")
+                .UseCollation("Modern_Spanish_CI_AS")
+                .HasColumnName("CREUSR");
+            entity.Property(e => e.Diagco)
+                .IsUnicode(false)
+                .HasComment("Diagnostico que el tecnico brinda al ticket")
+                .UseCollation("Modern_Spanish_CI_AS")
+                .HasColumnName("DIAGCO");
+            entity.Property(e => e.Fcheje)
+                .HasComment("Fecha de ejecucion de la orden.")
+                .HasColumnType("datetime")
+                .HasColumnName("FCHEJE");
+            entity.Property(e => e.Fchemi)
+                .HasDefaultValueSql("(getdate())")
+                .HasComment("Fecha de Emisión")
+                .HasColumnType("datetime")
+                .HasColumnName("FCHEMI");
+            entity.Property(e => e.Fchent)
+                .HasDefaultValueSql("(getdate())")
+                .HasComment("Fecha de entrega de la orden al tecnico.")
+                .HasColumnType("datetime")
+                .HasColumnName("FCHENT");
+            entity.Property(e => e.Fchfin)
+                .HasColumnType("datetime")
+                .HasColumnName("FCHFIN");
+            entity.Property(e => e.Fchini)
+                .HasDefaultValueSql("(getdate())")
+                .HasColumnType("datetime")
+                .HasColumnName("FCHINI");
+            entity.Property(e => e.Fchprg)
+                .HasColumnType("datetime")
+                .HasColumnName("FCHPRG");
+            entity.Property(e => e.Fchven)
+                .HasPrecision(0)
+                .HasColumnName("FCHVEN");
+            entity.Property(e => e.Flgasigna)
+                .HasComment("Flag que indica si generará orden ")
+                .HasColumnName("FLGASIGNA");
+            entity.Property(e => e.Flgequipo)
+                .HasDefaultValue(false)
+                .HasColumnName("FLGEQUIPO");
+            entity.Property(e => e.Flgimp)
+                .HasComment("Flag que indica si la orden ya ha sido impresa.")
+                .HasColumnName("FLGIMP");
+            entity.Property(e => e.Idcuadrilla)
+                .HasDefaultValue(0)
+                .HasColumnName("IDCuadrilla");
+            entity.Property(e => e.Ideaveria).HasColumnName("IDEAVERIA");
+            entity.Property(e => e.Idecia)
+                .HasDefaultValue(3)
+                .HasColumnName("IDECIA");
+            entity.Property(e => e.Ideclsord)
+                .HasComment("Id de la Clase de la Orden")
+                .HasColumnName("IDECLSORD");
+            entity.Property(e => e.Idecnt)
+                .HasComment("Id Interno del Contrato (Identity)")
+                .HasColumnName("IDECNT");
+            entity.Property(e => e.Idedetcnt)
+                .HasComment("Id Interno de la relación del Servicio y el Contrato")
+                .HasColumnName("IDEDETCNT");
+            entity.Property(e => e.Ideord)
+                .HasComment("Id de la Orden que es atendida")
+                .HasColumnName("IDEORD");
+            entity.Property(e => e.Idetecasg)
+                .HasDefaultValue(0)
+                .HasComment("Id del tecnico de Campo que tiene el ticket Asignada")
+                .HasColumnName("IDETECASG");
+            entity.Property(e => e.Idetipavi)
+                .HasComment("Id del tipo de Aviso")
+                .HasColumnName("IDETIPAVI");
+            entity.Property(e => e.Idezontec)
+                .HasDefaultValue(0)
+                .HasColumnName("IDEZONTEC");
+            entity.Property(e => e.Idnivel)
+                .HasDefaultValue(1)
+                .HasColumnName("IDNIVEL");
+            entity.Property(e => e.Idservicio).HasColumnName("IDSERVICIO");
+            entity.Property(e => e.IdtipoInstalacion).HasColumnName("IDTipoInstalacion");
+            entity.Property(e => e.Idvendedor).HasColumnName("IDVENDEDOR");
+            entity.Property(e => e.Impord)
+                .HasComment("Flag o Bandera que indica si la orden va a ser impresa o fue seleccionada")
+                .HasColumnName("IMPORD");
+            entity.Property(e => e.Modfch)
+                .HasDefaultValueSql("(getdate())")
+                .HasComment("Fecha de modificación del registro")
+                .HasColumnType("datetime")
+                .HasColumnName("MODFCH");
+            entity.Property(e => e.Modhsn)
+                .IsRequired()
+                .HasMaxLength(75)
+                .IsUnicode(false)
+                .HasDefaultValueSql("(host_name())")
+                .HasComment("Host Name de PC de Modificación")
+                .UseCollation("Modern_Spanish_CI_AS")
+                .HasColumnName("MODHSN");
+            entity.Property(e => e.Modips)
+                .IsRequired()
+                .HasMaxLength(50)
+                .IsUnicode(false)
+                .HasDefaultValue("000.000.000.000")
+                .HasComment("IP de PC de Modificación")
+                .UseCollation("Modern_Spanish_CI_AS")
+                .HasColumnName("MODIPS");
+            entity.Property(e => e.Modusr)
+                .IsRequired()
+                .HasMaxLength(50)
+                .IsUnicode(false)
+                .HasDefaultValueSql("(suser_sname())")
+                .HasComment("Usuario que modificó el registro")
+                .UseCollation("Modern_Spanish_CI_AS")
+                .HasColumnName("MODUSR");
+            entity.Property(e => e.Observ)
+                .IsRequired()
+                .IsUnicode(false)
+                .HasComment("Observacion de la Orden( A nivel de cabezera se guardará el ultimo comentario)")
+                .UseCollation("Modern_Spanish_CI_AS")
+                .HasColumnName("OBSERV");
+            entity.Property(e => e.Percontac)
+                .IsRequired()
+                .HasMaxLength(100)
+                .IsUnicode(false)
+                .HasDefaultValue("")
+                .HasComment("Persona de Contacto")
+                .UseCollation("Modern_Spanish_CI_AS")
+                .HasColumnName("PERCONTAC");
+            entity.Property(e => e.Priorizar)
+                .HasDefaultValue(false)
+                .HasColumnName("PRIORIZAR");
+
+            entity.HasOne(d => d.IdecntNavigation).WithMany(p => p.Msttickets)
+                .HasForeignKey(d => d.Idecnt)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("FK_MSTTICKET_MSTCNT");
+
+            entity.HasOne(d => d.IdedetcntNavigation).WithMany(p => p.Msttickets)
+                .HasForeignKey(d => d.Idedetcnt)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("FK_MSTTICKET_DETCNT");
+
+            entity.HasOne(d => d.IdetecasgNavigation).WithMany(p => p.Msttickets)
+                .HasForeignKey(d => d.Idetecasg)
+                .HasConstraintName("FK_MSTTICKET_MSTTECASG");
         });
 
         modelBuilder.Entity<Msttipsrvprd>(entity =>
@@ -5354,6 +5573,8 @@ public partial class CVGEntities : DbContext
             entity.ToTable("MSTVENTGEO", "CLI");
 
             entity.HasIndex(e => e.Ideftocnt, "IX_MSTVENTGEO_CONTRATO").IsUnique();
+
+            entity.HasIndex(e => e.Ideftocnt, "IX_MSTVENTGEO_IDEFTOCNT");
 
             entity.Property(e => e.Idventa).HasColumnName("IDVENTA");
             entity.Property(e => e.Crefch)

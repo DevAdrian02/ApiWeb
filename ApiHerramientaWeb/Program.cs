@@ -63,6 +63,7 @@ builder.Services.AddScoped<ModemService>();
 builder.Services.AddScoped<ICatvService, SmartOltCatvService>();
 builder.Services.AddScoped<ConfiguracionEmail>();
 builder.Services.AddScoped<IPdfGeneratorService, PdfGeneratorService>();
+builder.Services.AddScoped<OrdenService>();
 // 7. Swagger
 builder.Services.AddSwaggerGen(c =>
 {
