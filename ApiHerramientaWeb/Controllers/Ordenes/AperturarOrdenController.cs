@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore;
 using ModeloPrincipal.Entity;
 using System.Net;
 using System.Net.Mail;
-
+using ApiHerramientaWeb.Modelos.Ordenes;
 
 namespace ApiHerramientaWeb.Controllers.Ordenes
 {
@@ -16,12 +16,15 @@ namespace ApiHerramientaWeb.Controllers.Ordenes
     {
         private readonly CVGEntities _context;
         private readonly ConfiguracionEmail _configEmail;
+        private readonly OrdenService _repository;
 
 
-        public AperturarOrdenController(CVGEntities context, ConfiguracionEmail configEmail)
+
+        public AperturarOrdenController(CVGEntities context, ConfiguracionEmail configEmail, OrdenService repository)
         {
             _context = context;
             _configEmail = configEmail;
+            _repository = repository;
 
         }
 
@@ -82,7 +85,7 @@ namespace ApiHerramientaWeb.Controllers.Ordenes
             }
         }
 
-       
+
 
         #endregion
 
@@ -171,7 +174,7 @@ namespace ApiHerramientaWeb.Controllers.Ordenes
                     t.Apepritec,
                     t.Apesegtec,
                     t.Nomtec,
-                   
+
                 })
                 .ToListAsync();
 
@@ -196,6 +199,70 @@ namespace ApiHerramientaWeb.Controllers.Ordenes
             return Ok(cuadrillas);
 
         }
+
+        #endregion
+
+
+        #region APERTURA DE ORDEN
+
+
+
+        [HttpPost("aperturarOrden")]
+        public async Task<IActionResult> CrearOrdenColector([FromBody] CrearOrdenRequestModel request)
+        {
+            var result = await _repository.CrearOrdenColectorAsync(
+                request.IDECNT,
+                request.IDETECAsg,
+                request.IDCUADRILLA,
+                request.Usuario
+            );
+
+            return Ok(new { message = result });
+        }
+
+        [HttpPost("aperturarOrdenDesconexion")]
+        public async Task<IActionResult> CrearOrdenDesconexion([FromBody] CrearOrdenDesconexionModel request)
+        {
+            var result = await _repository.CrearOrdenDesconexionAsync(
+                request.IDECNT,
+                request.IDETECAsg,
+                request.IDCUADRILLA,
+                request.Usuario
+            );
+            return Ok(new { message = result });
+        }
+
+
+
+        [HttpGet("ConfirmarOrdenTipo")]
+        public async Task<IActionResult> ConfirmarOrdenTipo(int idefcnt)
+        {
+            try
+            {
+                // Buscar el contrato por idefcnt en la tabla mstcnt
+                var idecnt = await _context.Mstcnts
+                     .Where(c => c.Ideftocnt == idefcnt)
+                            .Select(c => c.Idecnt)
+                            .FirstOrDefaultAsync();
+
+                if (idecnt == null)
+                {
+                    return Ok(false);
+                }
+
+                // Verificar si existe una orden tipo 91 en estado 00020
+                bool tieneOrden = await _context.Msttickets
+                    .AnyAsync(t => t.Idecnt == idecnt && t.Ideord == 91 && t.Codesttkt == "00020");
+
+                return Ok(tieneOrden);
+            }
+            catch
+            {
+                // En caso de error, devolver false
+                return Ok(false);
+            }
+        }
+
 
         #endregion
 

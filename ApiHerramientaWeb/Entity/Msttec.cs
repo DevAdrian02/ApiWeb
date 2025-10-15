@@ -96,4 +96,6 @@ public partial class Msttec
     public int? Ideusr { get; set; }
 
     public bool? Flgtablet { get; set; }
+
+    public virtual ICollection<Mstticket> Msttickets { get; set; } = new List<Mstticket>();
 }

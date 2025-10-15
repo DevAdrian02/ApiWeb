@@ -8,6 +8,11 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <None Remove="Modelos\ORMDataModel.xpo" />
+    <None Remove="Modelos\ORMDataModel.xpo.diagram" />
+  </ItemGroup>
+
+  <ItemGroup>
     <None Include="efpt.config.json.user" />
   </ItemGroup>
 
@@ -38,7 +43,7 @@
 
   <ItemGroup>
     <Reference Include="sifco.Security">
-      <HintPath>bin\sifco.Security.dll</HintPath>
+      <HintPath>..\..\sifco\sifco.Security.dll</HintPath>
     </Reference>
   </ItemGroup>
 

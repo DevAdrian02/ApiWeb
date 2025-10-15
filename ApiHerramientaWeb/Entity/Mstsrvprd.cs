@@ -139,9 +139,9 @@ public partial class Mstsrvprd
     /// </summary>
     public bool? Flgbalcli { get; set; }
 
-    public decimal? Prebaseloc { get; set; }
+    public decimal? PreBaseLoc { get; set; }
 
-    public decimal? Prebasefor { get; set; }
+    public decimal? PreBaseFor { get; set; }
 
     public decimal? Mbps { get; set; }
 
@@ -150,6 +150,10 @@ public partial class Mstsrvprd
     public string CuentaContable { get; set; }
 
     public bool? Activo { get; set; }
+
+    public int? Prioridad { get; set; }
+
+    public bool? ProvisionaCpe { get; set; }
 
     public virtual ICollection<Detcnt> DetcntIdesrvprdNavigations { get; set; } = new List<Detcnt>();
 

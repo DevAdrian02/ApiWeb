@@ -285,5 +285,7 @@ public partial class Mstcnt
 
     public virtual ICollection<Mstspdido> Mstspdidos { get; set; } = new List<Mstspdido>();
 
+    public virtual ICollection<Mstticket> Msttickets { get; set; } = new List<Mstticket>();
+
     public virtual ICollection<Mstvalfac> Mstvalfacs { get; set; } = new List<Mstvalfac>();
 }

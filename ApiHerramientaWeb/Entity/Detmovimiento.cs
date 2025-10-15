@@ -31,5 +31,7 @@ public partial class Detmovimiento
 
     public int? Caja { get; set; }
 
+    public int? IdTecnologia { get; set; }
+
     public virtual Mstmovimiento IdmovimientoNavigation { get; set; }
 }

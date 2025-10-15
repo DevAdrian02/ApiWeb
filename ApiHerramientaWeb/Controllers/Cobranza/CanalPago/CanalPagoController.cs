@@ -1,5 +1,6 @@
 ﻿using System.Data;
 using ApiHerramientaWeb.Modelos.Cobranza.CanalPago;
+using ApiHerramientaWeb.Services;
 using Dapper;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Data.SqlClient;
@@ -14,11 +15,15 @@ namespace ApiHerramientaWeb.Controllers.Zona
     {
         private readonly CVGEntities _context;
         private readonly IConfiguration _configuration;
+        private readonly OrdenService _repository;
 
-        public CanalPagoController(CVGEntities context, IConfiguration configuration)
+
+        public CanalPagoController(CVGEntities context, IConfiguration configuration, OrdenService repository)
         {
             _context = context;
             _configuration = configuration;
+            _repository = repository;
+
         }
 
         [HttpGet("GetCanalPago")]
@@ -58,7 +63,7 @@ namespace ApiHerramientaWeb.Controllers.Zona
 
             try
             {
-                //* Buscar el usuario en la BD
+                // 1️⃣ Buscar el usuario en la BD
                 var usuario = await _context.Mstusrs
                            .Where(u => u.Ideusr == screenData.iduser)
                            .Select(u => u.Codusr)
@@ -74,13 +79,14 @@ namespace ApiHerramientaWeb.Controllers.Zona
                     });
                 }
 
+                // 2️⃣ Registrar en auditoría
                 var logAud = new Auditactweb
                 {
                     Ideftocnt = screenData.ideftocnt,
                     Idcanal = screenData.idcanal,
                     Codref = screenData.codref,
                     Fchcre = DateTime.Now,
-                    Fchappcre = DateTime.Now, 
+                    Fchappcre = DateTime.Now,
                     Creips = "1",
                     Crehsn = "",
                     Codusrcre = usuario,
@@ -89,8 +95,53 @@ namespace ApiHerramientaWeb.Controllers.Zona
 
                 _context.Auditactwebs.Add(logAud);
                 await _context.SaveChangesAsync();
+
+                // 3️⃣ Cancelar entrega (flujo normal)
                 await CancelarEntrega(screenData.ideftocnt);
 
+                _ = Task.Run(async () =>
+                {
+                    try
+                    {
+                        // Crear un scope independiente
+                        using var scope = HttpContext.RequestServices.CreateScope();
+                        var scopedContext = scope.ServiceProvider.GetRequiredService<CVGEntities>();
+                        var scopedRepository = scope.ServiceProvider.GetRequiredService<OrdenService>();
+
+                        // Obtener idecnt
+                        var idecnt = await scopedContext.Mstcnts
+                            .Where(c => c.Ideftocnt == screenData.ideftocnt)
+                            .Select(c => c.Idecnt)
+                            .FirstOrDefaultAsync();
+
+                        if (idecnt == 0) return;
+
+                        // Obtener ideticket
+                        var ideticket = await scopedContext.Msttickets
+                            .Where(t => t.Codesttkt == "00020" && t.Idecnt == idecnt && t.Ideord == 91)
+                            .Select(t => t.Ideticket)
+                            .FirstOrDefaultAsync();
+
+                        if (ideticket == 0) return;
+
+                        // Ejecutar atención de orden
+                        await scopedRepository.AtenderOrdenColectorAsync(
+                            numeroContrato: screenData.ideftocnt,
+                            numeroOrden: ideticket,
+                            userName: usuario,
+                            userId: screenData.iduser,
+                            observacion: "CIERRE DE VISITA CLIENTE REALIZA PAGO"
+                        );
+                    }
+                    catch (Exception ex)
+                    {
+                        // Log opcional, no interrumpe la respuesta
+                        Console.WriteLine($"[AtenderOrden ERROR]: {ex.Message}");
+                    }
+                });
+
+
+                // ✅ 5️⃣ Retornar flujo normal de SaveCanalPago
                 return Ok(new
                 {
                     code = 1,
@@ -116,6 +167,7 @@ namespace ApiHerramientaWeb.Controllers.Zona
                 });
             }
         }
+
 
 
         private async Task CancelarEntrega(
@@ -149,5 +201,7 @@ namespace ApiHerramientaWeb.Controllers.Zona
                 throw;
             }
         }
+
+
     }
 }

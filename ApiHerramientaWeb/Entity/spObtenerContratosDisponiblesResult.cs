@@ -8,6 +8,13 @@ namespace ModeloPrincipal.Entity
 {
     public partial class spObtenerContratosDisponiblesResult
     {
-        public long? IDEFTOCNT { get; set; }
+        public int IDEFTOCNT { get; set; }
+        public int IDEAGENTE { get; set; }
+        [StringLength(255)]
+        public string AGENTE { get; set; }
+        public int IDESUC { get; set; }
+        [StringLength(255)]
+        public string SUCURSAL { get; set; }
+        public byte IDEESTFTO { get; set; }
     }
 }
