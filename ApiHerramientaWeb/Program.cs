@@ -1,5 +1,6 @@
 ﻿using ApiHerramientaWeb.Controllers.Integraciones.Krill;
 using ApiHerramientaWeb.Controllers.Integraciones.SmartOlt;
+using ApiHerramientaWeb.Modelos;
 using ApiHerramientaWeb.Services;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
@@ -64,6 +65,11 @@ builder.Services.AddScoped<ICatvService, SmartOltCatvService>();
 builder.Services.AddScoped<ConfiguracionEmail>();
 builder.Services.AddScoped<IPdfGeneratorService, PdfGeneratorService>();
 builder.Services.AddScoped<OrdenService>();
+
+builder.Services.AddScoped<IDesactivarDispositivoService, DesactivarDispositivoService>();
+builder.Services.AddScoped<Utils>(); // 👈 Agregá esto
+
+
 // 7. Swagger
 builder.Services.AddSwaggerGen(c =>
 {
