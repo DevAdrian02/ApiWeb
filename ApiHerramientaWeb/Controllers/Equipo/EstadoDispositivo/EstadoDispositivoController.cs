@@ -24,6 +24,8 @@ namespace ApiHerramientaWeb.Controllers.Equipo.EstadoDispositivo
         private readonly SmartOltCatvService _smartOlCatvService;
         private readonly ModemService _estadoModemService;
         private readonly Utils _utils;
+        private readonly IDesactivarDispositivoService _desactivarDispositivoService;
+
 
         public EstadoDispositivoController(
             CVGEntities context,
@@ -31,7 +33,8 @@ namespace ApiHerramientaWeb.Controllers.Equipo.EstadoDispositivo
             KrillService krillService,
             SmartOltService smartOltService,
             SmartOltCatvService smartOlCatvService,
-            ModemService estadoModemService)
+            ModemService estadoModemService,
+            IDesactivarDispositivoService desactivarDispositivoService)
         {
             _context = context;
             _krillService = krillService;
@@ -39,6 +42,8 @@ namespace ApiHerramientaWeb.Controllers.Equipo.EstadoDispositivo
             _utils = new Utils(_context, configuration);
             _smartOlCatvService = smartOlCatvService;
             _estadoModemService = estadoModemService;
+            _desactivarDispositivoService = desactivarDispositivoService;
+
         }
 
 
@@ -195,75 +200,33 @@ namespace ApiHerramientaWeb.Controllers.Equipo.EstadoDispositivo
         #endregion
 
         #region Desactivar
-        [HttpPost("desactivarcm")]
-        public async Task<IActionResult> Desactivarcm([FromBody] DesactivarCmRequest request)
-        {
-            using var transaction = await _context.Database.BeginTransactionAsync();
-
-            try
+            [HttpPost("desactivarcm")]
+            public async Task<IActionResult> Desactivarcm([FromBody] DesactivarCmRequest request)
             {
-                var query = await _estadoModemService.ObtenerQuerySuspencion(request.Ideftocnt);
-                var suspesion = query.FirstOrDefault();
+                try
 
-                if (suspesion == null)
-                    return Json(new { success = false, mensaje = "Contrato no cuenta con factura pendiente" });
-
-                var resultado = _estadoModemService.ValidarDiaPagoSuspension(suspesion.DiaPago);
-                if (resultado.codigo != 0)
-                    return Json(new { success = false, resultado.mensaje });
-
-                var tipo_tecnologia = suspesion.IDTECNOLOGIA;
-                var activeIntegrations = await _context.Mstintegracions
-                    .Where(i => i.Idtecnologia == tipo_tecnologia && i.Activa == true)
-                    .Select(i => i.Idintegracion)
-                    .ToListAsync();
-
-                if (activeIntegrations.Count > 0 && suspesion.ActivacionColector == 0 && suspesion.Aprovisiona == true)
                 {
-                    foreach (var integracion_ in activeIntegrations)
-                    {
-                        switch (integracion_)
-                        {
-                            case 4: // Krill
-                                await _krillService.DesactivarAsync(
-                                    suspesion.COD_SUC,
-                                    suspesion.REALM);
-                                break;
+                    var ip = Request.HttpContext.Connection.RemoteIpAddress?.ToString() ?? "";
 
-                            case 2: // SmartOlt
-                                await _smartOltService.DesactivarAsync(
-                                    suspesion.COD_SUC);
-                                break;
-                        }
-                    }
+
+                    var resultado = await _desactivarDispositivoService.DesactivarCmInternoAsync(request,ip);
+
+                    if (!resultado.Success)
+                        return Json(new { success = false, mensaje = resultado.Mensaje });
+
+                    return Json(new { success = true, mensaje = resultado.Mensaje });
                 }
-
-                var usuario = await _utils.ObtenerCodigoUsuarioPorIdAsync(request.iduser);
-                if (string.IsNullOrEmpty(usuario))
-                    return Json(new { success = false, mensaje = "Usuario no encontrado." });
-
-                var ip = Request.HttpContext.Connection.RemoteIpAddress?.ToString() ?? "";
-                var (success, error) = await _estadoModemService.RegistrarSuspensionAsync(
-                    suspesion.IDCONTRATO,
-                    request.Comentario,
-                    usuario,
-                    ip,
-                    suspesion.CONTRATO.ToString()
-                );
-
-                if (!success)
-                    return Json(new { success = false, mensaje = error });
-
-                await transaction.CommitAsync();
-                return Json(new { success = true, mensaje = "Suspension exitosa" });
+                catch (Exception ex)
+                {
+                    return Json(new { success = false, mensaje = ex.Message });
+                }
             }
-            catch (Exception ex)
-            {
-                await transaction.RollbackAsync();
-                return Json(new { success = false, mensaje = ex.Message });
-            }
-        }
+
         #endregion
+
+
+
+
 
         #region Habilitar Botón TV
         [HttpGet("habilitarBotonTv")]

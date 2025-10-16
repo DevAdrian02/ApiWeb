@@ -7,6 +7,7 @@ using ModeloPrincipal.Entity;
 using System.Net;
 using System.Net.Mail;
 using ApiHerramientaWeb.Modelos.Ordenes;
+using static ApiHerramientaWeb.Modelos.Operaciones.Estructuras.DatosOpe.cablemodems;
 
 namespace ApiHerramientaWeb.Controllers.Ordenes
 {
@@ -17,14 +18,17 @@ namespace ApiHerramientaWeb.Controllers.Ordenes
         private readonly CVGEntities _context;
         private readonly ConfiguracionEmail _configEmail;
         private readonly OrdenService _repository;
+        private readonly IDesactivarDispositivoService _desactivarDispositivoService;
 
 
 
-        public AperturarOrdenController(CVGEntities context, ConfiguracionEmail configEmail, OrdenService repository)
+
+        public AperturarOrdenController(CVGEntities context, ConfiguracionEmail configEmail, OrdenService repository, IDesactivarDispositivoService desactivarDispositivoService)
         {
             _context = context;
             _configEmail = configEmail;
             _repository = repository;
+            _desactivarDispositivoService = desactivarDispositivoService;
 
         }
 
@@ -205,29 +209,79 @@ namespace ApiHerramientaWeb.Controllers.Ordenes
 
         #region APERTURA DE ORDEN
 
-
-
         [HttpPost("aperturarOrden")]
         public async Task<IActionResult> CrearOrdenColector([FromBody] CrearOrdenRequestModel request)
         {
+            // 1️⃣ Crear orden normalmente
+            var ip = Request.HttpContext.Connection.RemoteIpAddress?.ToString() ?? "";
+
+            var user = await _context.Mstusrs
+               .Where(c => c.Ideusr == request.Usuario)
+               .Select(c => new { c.Codusr })
+               .FirstOrDefaultAsync();
+
             var result = await _repository.CrearOrdenColectorAsync(
                 request.IDECNT,
                 request.IDETECAsg,
                 request.IDCUADRILLA,
-                request.Usuario
+                user.Codusr
             );
 
-            return Ok(new { message = result });
+            // 2️⃣ Buscar el IDEFTOCNT (o IDEFCONT) en la tabla MSTCNT según IDECNT
+            var contrato = await _context.Mstcnts
+                .Where(c => c.Idecnt == request.IDECNT)
+                .Select(c => new { c.Ideftocnt }) // o c.Ideftocnt según cómo se llame en tu modelo
+                .FirstOrDefaultAsync();
+
+            if (contrato == null)
+            {
+                return BadRequest(new { message = "No se encontró el contrato en MSTCNT con ese IDECNT." });
+            }
+
+            var iduser = await _context.Mstusrs
+                .Where(c => c.Ideusr == request.Usuario)
+                .Select(c => new { c.Ideusr })
+                .FirstOrDefaultAsync();
+
+            if (iduser == null)
+            {
+                return BadRequest(new { message = "No se encontró el usuario" });
+            }
+
+
+            // 3️⃣ Armar la solicitud para desactivar
+            var desactivarRequest = new DesactivarCmRequest
+            {
+                iduser = iduser.Ideusr,
+                Ideftocnt = contrato.Ideftocnt, // el valor que obtuvimos
+                Comentario = "Desactivado al crear orden"
+            };
+
+            // 4️⃣ Llamar al método interno
+            var desactivarResultado = await _desactivarDispositivoService.DesactivarCmInternoAsync(desactivarRequest, ip);
+
+            // 5️⃣ Responder con ambos resultados
+            return Ok(new
+            {
+                message = result,
+                desactivacion = desactivarResultado
+            });
         }
+
 
         [HttpPost("aperturarOrdenDesconexion")]
         public async Task<IActionResult> CrearOrdenDesconexion([FromBody] CrearOrdenDesconexionModel request)
         {
+            var user = await _context.Mstusrs
+           .Where(c => c.Ideusr == request.Usuario)
+           .Select(c => new { c.Codusr })
+           .FirstOrDefaultAsync();
+
             var result = await _repository.CrearOrdenDesconexionAsync(
                 request.IDECNT,
                 request.IDETECAsg,
                 request.IDCUADRILLA,
-                request.Usuario
+                user.Codusr
             );
             return Ok(new { message = result });
         }
