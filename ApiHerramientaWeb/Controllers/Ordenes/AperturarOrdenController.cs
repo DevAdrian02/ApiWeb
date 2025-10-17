@@ -320,5 +320,19 @@ namespace ApiHerramientaWeb.Controllers.Ordenes
 
         #endregion
 
+        #region Obtener historico visitas
+
+
+        [HttpGet("visitas/{idUser}")]
+        public async Task<IActionResult> ObtenerVisitasColector(int idUser)
+        {
+            var visitas = await _repository.ObtenerVisitasColectorPorUsuarioAsync(idUser);
+
+            if (visitas == null || visitas.Count == 0)
+                return NotFound(new { mensaje = "No se encontraron visitas para este usuario." });
+
+            return Ok(visitas);
+        }
+        #endregion
     }
 }

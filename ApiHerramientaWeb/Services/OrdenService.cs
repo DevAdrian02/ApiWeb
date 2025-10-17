@@ -1,6 +1,7 @@
 ﻿using Dapper;
 using Microsoft.Data.SqlClient;
 using System.Data;
+using ApiHerramientaWeb.Modelos.Ordenes;
 
 namespace ApiHerramientaWeb.Services
 {
@@ -146,5 +147,52 @@ namespace ApiHerramientaWeb.Services
                 throw new Exception($"Error al atender la orden: {ex.Message}", ex);
             }
         }
+
+
+
+        public async Task<List<VisitaColectorHistorico>> ObtenerVisitasColectorPorUsuarioAsync(int idUser)
+        {
+            var visitas = new List<VisitaColectorHistorico>();
+
+            using var connection = new SqlConnection(_connectionString);
+
+            using var command = new SqlCommand("ORD.spObtenerVisitasColectorPorUsuario", connection)
+            {
+                CommandType = CommandType.StoredProcedure
+            };
+
+            command.Parameters.AddWithValue("@IDUSER", idUser);
+
+            await connection.OpenAsync();
+
+            try
+            {
+                using var reader = await command.ExecuteReaderAsync();
+                while (await reader.ReadAsync())
+                {
+                    visitas.Add(new VisitaColectorHistorico
+                    {
+                        IdAuditoria = reader.GetInt32(reader.GetOrdinal("ID_AUDITORIA")),
+                        IdUser = reader.GetInt32(reader.GetOrdinal("IDUSER")),
+                        IdEtTicket = reader.GetInt32(reader.GetOrdinal("IDETTICKET")),
+                        Contrato = reader.GetInt32(reader.GetOrdinal("CONTRATO")),
+                        EstadoOrden = reader["ESTADO_ORDEN"].ToString() ?? string.Empty,
+                        ResultadoVisita = reader["RESULTADO_VISITA"].ToString() ?? string.Empty,
+                        FechaRegistro = reader.GetDateTime(reader.GetOrdinal("FECHA_REGISTRO"))
+                    });
+                }
+            }
+            catch (SqlException ex)
+            {
+                Console.WriteLine($"Error SQL: {ex.Message}");
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error general: {ex.Message}");
+            }
+
+            return visitas;
+        }
+
     }
 }
