@@ -99,46 +99,40 @@ namespace ApiHerramientaWeb.Controllers.Zona
                 // 3️⃣ Cancelar entrega (flujo normal)
                 await CancelarEntrega(screenData.ideftocnt);
 
-                _ = Task.Run(async () =>
+                try
                 {
-                    try
+                    using var scope = HttpContext.RequestServices.CreateScope();
+                    var scopedContext = scope.ServiceProvider.GetRequiredService<CVGEntities>();
+                    var scopedRepository = scope.ServiceProvider.GetRequiredService<OrdenService>();
+
+                    var idecnt = await scopedContext.Mstcnts
+                        .Where(c => c.Ideftocnt == screenData.ideftocnt)
+                        .Select(c => c.Idecnt)
+                        .FirstOrDefaultAsync();
+
+                    if (idecnt != 0)
                     {
-                        // Crear un scope independiente
-                        using var scope = HttpContext.RequestServices.CreateScope();
-                        var scopedContext = scope.ServiceProvider.GetRequiredService<CVGEntities>();
-                        var scopedRepository = scope.ServiceProvider.GetRequiredService<OrdenService>();
-
-                        // Obtener idecnt
-                        var idecnt = await scopedContext.Mstcnts
-                            .Where(c => c.Ideftocnt == screenData.ideftocnt)
-                            .Select(c => c.Idecnt)
-                            .FirstOrDefaultAsync();
-
-                        if (idecnt == 0) return;
-
-                        // Obtener ideticket
                         var ideticket = await scopedContext.Msttickets
                             .Where(t => t.Codesttkt == "00020" && t.Idecnt == idecnt && t.Ideord == 91)
                             .Select(t => t.Ideticket)
                             .FirstOrDefaultAsync();
 
-                        if (ideticket == 0) return;
-
-                        // Ejecutar atención de orden
-                        await scopedRepository.AtenderOrdenColectorAsync(
-                            numeroContrato: screenData.ideftocnt,
-                            numeroOrden: ideticket,
-                            userName: usuario,
-                            userId: screenData.iduser,
-                            observacion: "CIERRE DE VISITA CLIENTE REALIZA PAGO"
-                        );
+                        if (ideticket != 0)
+                        {
+                            await scopedRepository.AtenderOrdenColectorAsync(
+                                numeroContrato: screenData.ideftocnt,
+                                numeroOrden: ideticket,
+                                userName: usuario,
+                                userId: screenData.iduser,
+                                observacion: "CIERRE DE VISITA CLIENTE REALIZA PAGO"
+                            );
+                        }
                     }
-                    catch (Exception ex)
-                    {
-                        // Log opcional, no interrumpe la respuesta
-                        Console.WriteLine($"[AtenderOrden ERROR]: {ex.Message}");
-                    }
-                });
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine($"[AtenderOrden ERROR]: {ex.Message}");
+                }
 
 
                 // ✅ 5️⃣ Retornar flujo normal de SaveCanalPago
