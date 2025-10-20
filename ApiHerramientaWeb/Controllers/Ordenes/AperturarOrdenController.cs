@@ -272,19 +272,55 @@ namespace ApiHerramientaWeb.Controllers.Ordenes
         [HttpPost("aperturarOrdenDesconexion")]
         public async Task<IActionResult> CrearOrdenDesconexion([FromBody] CrearOrdenDesconexionModel request)
         {
+            // Buscar usuario
             var user = await _context.Mstusrs
-           .Where(c => c.Ideusr == request.Usuario)
-           .Select(c => new { c.Codusr })
-           .FirstOrDefaultAsync();
+                .Where(c => c.Ideusr == request.Usuario)
+                .Select(c => new { c.Codusr })
+                .FirstOrDefaultAsync();
 
+            if (user == null)
+            {
+                return BadRequest(new { message = "Usuario no encontrado." });
+            }
+
+            // Crear orden principal
             var result = await _repository.CrearOrdenDesconexionAsync(
                 request.IDECNT,
                 request.IDETECAsg,
                 request.IDCUADRILLA,
                 user.Codusr
             );
+
+            // Intentar notificar al servicio externo (sin importar si falla)
+            try
+            {
+                using (var httpClient = new HttpClient())
+                {
+                    var url = "https://wservices.casavision.com/CvApiDev/api/cv/SendNotificationByTecnico";
+
+                    var payload = new
+                    {
+                        IdTecnico = request.IDETECAsg,
+                        TipoNotificacion = 3
+                    };
+
+                    var json = System.Text.Json.JsonSerializer.Serialize(payload);
+                    var content = new StringContent(json, System.Text.Encoding.UTF8, "application/json");
+
+                    var response = await httpClient.PostAsync(url, content);
+
+                    // Ignorar completamente la respuesta (no importa si da error o no)
+                }
+            }
+            catch
+            {
+                // Silenciosamente ignorar cualquier error del API externo
+            }
+
+            // Responder éxito principal
             return Ok(new { message = result });
         }
+
 
 
 
