@@ -32,6 +32,10 @@
          "ObjectType": 0
       },
       {
+         "Name": "[CLI].[MSTLOGIN]",
+         "ObjectType": 0
+      },
+      {
          "Name": "[CLI].[MSTSUC]",
          "ObjectType": 0
       },

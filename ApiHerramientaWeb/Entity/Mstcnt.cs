@@ -277,6 +277,8 @@ public partial class Mstcnt
 
     public DateTime? FechaUltEstado { get; set; }
 
+    public int Nis { get; set; }
+
     public virtual ICollection<Detcnt> Detcnts { get; set; } = new List<Detcnt>();
 
     public virtual ICollection<Mstfac> Mstfacs { get; set; } = new List<Mstfac>();

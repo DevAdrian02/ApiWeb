@@ -148,6 +148,8 @@ public partial class Mstubigeo
 
     public int? Idetecanterior { get; set; }
 
+    public bool? Activo { get; set; }
+
     public virtual Mstubigeo IdepadugeNavigation { get; set; }
 
     public virtual Mstsuc IdesucNavigation { get; set; }

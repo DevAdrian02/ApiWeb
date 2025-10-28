@@ -38,24 +38,6 @@ namespace ApiHerramientaWeb.Services
             return await EnviarCorreoSendGridSMTP(destinatario, asunto, cuerpoHtml, adjuntos);
         }
 
-        // Método genérico para cualquier tipo de archivo
-        public async Task<(bool Exito, string? Error)> EnviarCorreoConAdjuntos(
-            string destinatario,
-            string asunto,
-            string cuerpoHtml,
-            List<ArchivoAdjunto>? adjuntos = null)
-        {
-            return await EnviarCorreoSendGridSMTP(destinatario, asunto, cuerpoHtml, adjuntos);
-        }
-
-        // Método sin adjuntos
-        public async Task<(bool Exito, string? Error)> EnviarCorreoSimple(
-            string destinatario,
-            string asunto,
-            string cuerpoHtml)
-        {
-            return await EnviarCorreoSendGridSMTP(destinatario, asunto, cuerpoHtml, null);
-        }
 
         // Método principal corregido
         public async Task<(bool Exito, string? Error)> EnviarCorreoSendGridSMTP(
@@ -111,8 +93,6 @@ namespace ApiHerramientaWeb.Services
                     {
                         if (adjunto.Contenido != null && adjunto.Contenido.Length > 0)
                         {
-                            // CORRECCIÓN: No usar using para el MemoryStream
-                            // Crear el Attachment directamente desde el byte array
                             var stream = new MemoryStream(adjunto.Contenido);
                             var attachment = new Attachment(stream, adjunto.NombreArchivo, adjunto.TipoMime);
 

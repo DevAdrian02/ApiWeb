@@ -96,6 +96,10 @@ public partial class Mstsuc
 
     public bool? Regmovcpe { get; set; }
 
+    public decimal? Latitud { get; set; }
+
+    public decimal? Longitud { get; set; }
+
     public virtual ICollection<Mstcli> Mstclis { get; set; } = new List<Mstcli>();
 
     public virtual ICollection<Mstlstpre> Mstlstpres { get; set; } = new List<Mstlstpre>();

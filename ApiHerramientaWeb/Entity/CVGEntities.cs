@@ -87,6 +87,8 @@ public partial class CVGEntities : DbContext
 
     public virtual DbSet<Mstlibfac> Mstlibfacs { get; set; }
 
+    public virtual DbSet<Mstlogin> Mstlogins { get; set; }
+
     public virtual DbSet<Mstlstpre> Mstlstpres { get; set; }
 
     public virtual DbSet<Mstmarca> Mstmarcas { get; set; }
@@ -2315,6 +2317,8 @@ public partial class CVGEntities : DbContext
 
             entity.HasIndex(e => e.Ideszn, "NCI_MstCnt_ContratoZona");
 
+            entity.HasIndex(e => e.Idesuc, "NCI_MstCnt_IDSucursalEstado");
+
             entity.HasIndex(e => new { e.Idesuc, e.Idedep, e.Idemun, e.Idezon, e.Ideszn }, "NCI_MstCnt_IdClienteUbicacion");
 
             entity.HasIndex(e => e.Idemun, "NCI_MstCnt_Ubicacion");
@@ -2534,6 +2538,7 @@ public partial class CVGEntities : DbContext
                 .HasComment("Monto Subtotal de Precios del Servicioo Producto Extra")
                 .HasColumnType("numeric(18, 2)")
                 .HasColumnName("MTOSUBPRXTR");
+            entity.Property(e => e.Nis).HasColumnName("NIS");
             entity.Property(e => e.Nomfac)
                 .IsRequired()
                 .HasMaxLength(100)
@@ -3185,6 +3190,33 @@ public partial class CVGEntities : DbContext
             entity.Property(e => e.Numfinfac).HasColumnName("NUMFINFAC");
             entity.Property(e => e.Numinifac).HasColumnName("NUMINIFAC");
             entity.Property(e => e.Ultnumfact).HasColumnName("ULTNUMFACT");
+        });
+
+        modelBuilder.Entity<Mstlogin>(entity =>
+        {
+            entity.HasKey(e => e.NoContrato);
+
+            entity.ToTable("MSTLOGIN", "CLI", tb => tb.HasComment("Información general de la cuenta activada de MoviTV\r\n"));
+
+            entity.HasIndex(e => new { e.NoContrato, e.Login }, "UX_MSTLOGIN_NoContrato_Login").IsUnique();
+
+            entity.Property(e => e.NoContrato).ValueGeneratedNever();
+            entity.Property(e => e.Email)
+                .IsRequired()
+                .HasMaxLength(100);
+            entity.Property(e => e.FechaActivacion).HasColumnType("datetime");
+            entity.Property(e => e.FechaRegistro)
+                .HasDefaultValueSql("(sysdatetime())")
+                .HasColumnType("datetime");
+            entity.Property(e => e.Login)
+                .IsRequired()
+                .HasMaxLength(20);
+            entity.Property(e => e.Password)
+                .IsRequired()
+                .HasMaxLength(50);
+            entity.Property(e => e.UsuarioRegistro)
+                .HasMaxLength(20)
+                .HasDefaultValueSql("(suser_sname())");
         });
 
         modelBuilder.Entity<Mstlstpre>(entity =>
@@ -4587,6 +4619,8 @@ public partial class CVGEntities : DbContext
             entity.Property(e => e.Idelibfac).HasColumnName("IDELIBFAC");
             entity.Property(e => e.Idintegracion).HasColumnName("IDIntegracion");
             entity.Property(e => e.Idolt).HasColumnName("IDOLT");
+            entity.Property(e => e.Latitud).HasColumnType("decimal(15, 13)");
+            entity.Property(e => e.Longitud).HasColumnType("decimal(16, 13)");
             entity.Property(e => e.Modfch)
                 .HasDefaultValueSql("(getdate())")
                 .HasComment("Fecha de modificación del registro")
