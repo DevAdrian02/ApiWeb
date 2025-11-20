@@ -151,6 +151,8 @@ public partial class CVGEntities : DbContext
 
     public virtual DbSet<TblCatalogoComisionVtum> TblCatalogoComisionVta { get; set; }
 
+    public virtual DbSet<TrackingTecnico> TrackingTecnicos { get; set; }
+
     public virtual DbSet<VwContratoActivar> VwContratoActivars { get; set; }
 
     public virtual DbSet<VwContratosServiciosW> VwContratosServiciosWs { get; set; }
@@ -174,6 +176,8 @@ public partial class CVGEntities : DbContext
     public virtual DbSet<VwPlanificacione> VwPlanificaciones { get; set; }
 
     public virtual DbSet<VwServiciosW> VwServiciosWs { get; set; }
+
+    public virtual DbSet<VwcontratoCliente> VwcontratoClientes { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -3210,7 +3214,7 @@ public partial class CVGEntities : DbContext
                 .HasColumnType("datetime");
             entity.Property(e => e.Login)
                 .IsRequired()
-                .HasMaxLength(20);
+                .HasMaxLength(50);
             entity.Property(e => e.Password)
                 .IsRequired()
                 .HasMaxLength(50);
@@ -6108,6 +6112,23 @@ public partial class CVGEntities : DbContext
             entity.Property(e => e.MontoComisionVta).HasColumnType("numeric(18, 2)");
         });
 
+        modelBuilder.Entity<TrackingTecnico>(entity =>
+        {
+            entity.HasKey(e => e.Id).HasName("PK__tracking__3214EC07B91B97DA");
+
+            entity.ToTable("trackingTecnico", "ORD");
+
+            entity.Property(e => e.Idsuc).HasColumnName("idsuc");
+            entity.Property(e => e.Latitude).HasColumnType("decimal(20, 12)");
+            entity.Property(e => e.Longitude).HasColumnType("decimal(20, 12)");
+            entity.Property(e => e.Tecnico)
+                .IsRequired()
+                .HasMaxLength(100);
+            entity.Property(e => e.Timestamp)
+                .HasDefaultValueSql("(getdate())")
+                .HasColumnType("datetime");
+        });
+
         modelBuilder.Entity<VwContratoActivar>(entity =>
         {
             entity
@@ -6682,6 +6703,30 @@ public partial class CVGEntities : DbContext
                 .IsUnicode(false)
                 .UseCollation("Modern_Spanish_CI_AS")
                 .HasColumnName("SERVICIO");
+        });
+
+        modelBuilder.Entity<VwcontratoCliente>(entity =>
+        {
+            entity
+                .HasNoKey()
+                .ToView("VWContratoCliente", "ORD");
+
+            entity.Property(e => e.Contrato).HasColumnName("contrato");
+            entity.Property(e => e.Direccion)
+                .IsRequired()
+                .HasMaxLength(250)
+                .IsUnicode(false)
+                .HasColumnName("direccion");
+            entity.Property(e => e.Mail)
+                .HasMaxLength(50)
+                .IsUnicode(false)
+                .UseCollation("Modern_Spanish_CI_AS")
+                .HasColumnName("mail");
+            entity.Property(e => e.Name)
+                .IsRequired()
+                .HasMaxLength(202)
+                .IsUnicode(false)
+                .HasColumnName("name");
         });
 
         OnModelCreatingPartial(modelBuilder);

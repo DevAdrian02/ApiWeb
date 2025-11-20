@@ -1,5 +1,6 @@
 ﻿using ApiHerramientaWeb.Controllers.Integraciones.Krill;
 using ApiHerramientaWeb.Controllers.Integraciones.SmartOlt;
+using ApiHerramientaWeb.Hubs;
 using ApiHerramientaWeb.Modelos;
 using ApiHerramientaWeb.Services;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
@@ -21,16 +22,25 @@ builder.Services.AddDbContextPool<CVGEntities>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 
 // 3. Configurar CORS
+string[] allowedOrigins = new string[]
+{
+    "http://localhost:3000",               // Desarrollo
+    "https://wservices.casavision.com" ,   // Producción
+    "https://herramientaweb3.vercel.app"    // ProducciónF
+};
+
 builder.Services.AddCors(options =>
 {
-    options.AddPolicy("AllowAll", policy =>
+    options.AddPolicy("AllowSpecificOrigins", policy =>
     {
         policy
-            .AllowAnyOrigin()
+            .WithOrigins(allowedOrigins)
             .AllowAnyMethod()
-            .AllowAnyHeader();
+            .AllowAnyHeader()
+            .AllowCredentials(); // necesario para JWT/cookies
     });
 });
+
 
 // 4. Autenticación JWT
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
@@ -78,36 +88,40 @@ builder.Services.AddSwaggerGen(c =>
 
 builder.Services.AddScoped<ReciboController>();
 
+builder.Services.AddSignalR();
+
 
 var app = builder.Build();
 
 // 🔧 Configuración del pipeline
-
-// Si tu API vive bajo subruta
-app.UsePathBase("/ApiHerramientaWeb");
-
 app.UseRouting();
 
-// ✅ CORS debe ir ANTES de auth
-app.UseCors("AllowAll");
+// CORS antes de Auth
+app.UseCors("AllowSpecificOrigins");
 
 app.UseAuthentication();
 app.UseAuthorization();
+
+app.UseWebSockets();
+
+// Primero controladores
+app.MapControllers();
+
+// Luego Hubs (✔ esto evita el 404 intermitente)
+app.MapHub<UbicacionHub>("/hubs/ubicacion");
 
 // Swagger
 app.UseSwagger();
 app.UseSwaggerUI();
 
+// Redirección segura
 app.MapGet("/", context =>
 {
     context.Response.Redirect("/ApiHerramientaWeb/swagger");
     return Task.CompletedTask;
 });
 
-// Endpoint de prueba para CORS
+// Endpoint de prueba
 app.MapGet("/testcors", () => Results.Ok("CORS funciona!"));
-
-// Mapear controladores
-app.MapControllers();
 
 app.Run();

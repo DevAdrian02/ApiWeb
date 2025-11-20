@@ -20,9 +20,9 @@ namespace ApiHerramientaWeb.Controllers.Clientes.Expendiente
             _context = context;
         }
 
-        #region Métodos Públicos
 
-        [HttpGet("GetExpendiente")]     
+        #region GetExpendientexContrato
+        [HttpGet("GetExpendiente")]
         public async Task<IActionResult> GetExpendiente(
             int contrato,
             CancellationToken cancellationToken = default)
@@ -65,6 +65,39 @@ namespace ApiHerramientaWeb.Controllers.Clientes.Expendiente
                 return BadRequest(new { message = "Error al obtener el expendiente", error = ex.Message });
             }
         }
+        #endregion
+
+        #region GetContratoXNombre
+
+        [HttpGet("BuscarContrato")]
+        public async Task<IActionResult> BuscarContrato(
+            string nombre,
+            CancellationToken cancellationToken = default)
+        {
+            try
+            {
+                var connectionString = _configuration.GetConnectionString("DefaultConnection");
+                await using var connection = new SqlConnection(connectionString);
+                await connection.OpenAsync(cancellationToken);
+                var parameters = new DynamicParameters();
+                parameters.Add("@Nombre", nombre, DbType.String);
+
+                var resultados = await connection.QueryAsync(
+                    sql: "CXC.spBuscarContratosPorNombre",
+                    param: parameters,
+                    commandType: CommandType.StoredProcedure
+                );
+
+                return Ok(resultados);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { message = "Error al buscar contratos", error = ex.Message });
+            }
+        }
+        #endregion
+
+        #region ActualizarInformacion
 
         [HttpPost("UpdateInformacion")]
         public async Task<IActionResult> UpdateInformacion([FromBody] UpdateInformacionRequest request, CancellationToken cancellationToken = default)
@@ -72,8 +105,8 @@ namespace ApiHerramientaWeb.Controllers.Clientes.Expendiente
             try
             {
                 var contrato = await _context.Mstcnts
-                     .Where(c => c.Ideftocnt == request.Cpm)
-                     .FirstOrDefaultAsync();
+                    .Where(c => c.Ideftocnt == request.Cpm)
+                    .FirstOrDefaultAsync();
                 if (contrato == null)
                 {
                     return NotFound(new { code = 0, message = "Contrato no encontrado." });
@@ -84,8 +117,8 @@ namespace ApiHerramientaWeb.Controllers.Clientes.Expendiente
 
 
                 var cliente = await _context.Mstclis
-                       .Where(c => c.Idecli == contrato.Idecli)
-                       .FirstOrDefaultAsync();
+                    .Where(c => c.Idecli == contrato.Idecli)
+                    .FirstOrDefaultAsync();
                 if (cliente == null)
                 {
                     return NotFound(new { code = 0, message = "Cliente no encontrado." });
@@ -116,5 +149,9 @@ namespace ApiHerramientaWeb.Controllers.Clientes.Expendiente
         }
 
         #endregion
+
+
+
+ 
     }
 }

@@ -114,7 +114,39 @@ namespace ApiHerramientaWeb.Controllers.MoviTv
             }
         }
 
-    
+
+        [HttpGet("GetDataContrato")]
+        public async Task<IActionResult> GetDataContrato(
+            int contrato,
+            CancellationToken cancellationToken = default)
+        {
+            try
+            {
+                var contratoCliente = await _context.VwcontratoClientes
+                    .Where(c => c.Contrato == contrato)
+                    .Select(c => new
+                    {
+                        c.Contrato,
+                        c.Mail,
+                        c.Name,
+                        c.Direccion,
+                    })
+                    .FirstOrDefaultAsync(cancellationToken);
+
+                if (contratoCliente == null)
+                {
+                    return NotFound(new { Message = "Contrato no encontrado." });
+                }
+
+                return Ok(contratoCliente);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { Error = ex.Message });
+            }
+        }
+
+
     }
 
     // Modelos para los requests

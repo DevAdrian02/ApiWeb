@@ -26,4 +26,6 @@ public partial class Mstlogin
     public bool Activado { get; set; }
 
     public DateTime? FechaActivacion { get; set; }
+
+    public Guid? IdUsuarioCuenta { get; set; }
 }

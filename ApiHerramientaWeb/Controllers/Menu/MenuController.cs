@@ -187,7 +187,10 @@ namespace ApiHerramientaWeb.Controllers.Menu
         {
             var menu = new List<object>();
 
-            foreach (var padre in padres)
+            // **ORDENAR: Home primero**
+            var padresOrdenados = padres.OrderBy(p => p.DSCOBJ == "Home" ? 0 : 1).ToList();
+
+            foreach (var padre in padresOrdenados)
             {
                 var hijosDelPadre = hijos.FindAll(h => h.IDEOBJPAD == padre.IDEOBJ);
                 var childrenList = new List<object>();
@@ -202,12 +205,44 @@ namespace ApiHerramientaWeb.Controllers.Menu
                     });
                 }
 
-                menu.Add(new
+                bool isHome = padre.DSCOBJ == "Home";
+                bool hasChildren = hijosDelPadre.Count > 0;
+
+                if (isHome)
                 {
-                    title = padre.DSCOBJ,
-                    icon = padre.ICONO,
-                    children = childrenList
-                });
+                    // **Home siempre tiene path "/home"**
+                    if (hasChildren)
+                    {
+                        // Home con hijos -> agregar con children
+                        menu.Add(new
+                        {
+                            title = padre.DSCOBJ,
+                            icon = padre.ICONO,
+                           
+                            children = childrenList
+                        });
+                    }
+                    else
+                    {
+                        // Home sin hijos -> solo path
+                        menu.Add(new
+                        {
+                            title = padre.DSCOBJ,
+                            icon = padre.ICONO,
+                            path = "/home"
+                        });
+                    }
+                }
+                else
+                {
+                    // Otros items del menú - sin path, solo children si tienen
+                    menu.Add(new
+                    {
+                        title = padre.DSCOBJ,
+                        icon = padre.ICONO,
+                        children = childrenList
+                    });
+                }
             }
 
             return menu;

@@ -25,7 +25,7 @@ namespace ApiHerramientaWeb.Modelos.Cobranza.Recibo
     <style>
         body {{
             font-family: 'Segoe UI', Arial, sans-serif;
-            max-width: 700px;
+            max-width: 800px;
             margin: 0 auto;
             padding: 20px;
             background-color: #f8f9fa;
@@ -114,7 +114,7 @@ namespace ApiHerramientaWeb.Modelos.Cobranza.Recibo
         .data-table {{
             width: 100%;
             border-collapse: collapse;
-            font-size: 13px;
+            font-size: 12px;
         }}
         .data-table th {{
             background-color: #495057;
@@ -227,14 +227,14 @@ namespace ApiHerramientaWeb.Modelos.Cobranza.Recibo
                             <tr>
                                 <th class='text-left'>Descripción</th>
                                 <th class='text-center'>Cantidad</th>
+                                <th class='text-center'>Precio Unitario</th>
                                 <th class='text-right'>Total</th>
                             </tr>
                         </thead>
                         <tbody>
                             {GenerarFilasServicios(request)}
                             <tr class='total-row'>
-                                <td class='text-left'><strong>TOTAL SERVICIOS</strong></td>
-                                <td class='text-center'></td>
+                                <td class='text-left' colspan='3'><strong>TOTAL SERVICIOS</strong></td>
                                 <td class='text-right'><strong>{FormatCurrency(totalServicios)}</strong></td>
                             </tr>
                         </tbody>
@@ -293,6 +293,7 @@ namespace ApiHerramientaWeb.Modelos.Cobranza.Recibo
                 <tr>
                     <td class='text-left'>{costo.Servicio}</td>
                     <td class='text-center'>{costo.CantidadFacturas.ToString("N0")}</td>
+                    <td class='text-center'>{FormatCurrency(costo.PrecioUnitario)}</td>
                     <td class='text-right'>{FormatCurrency(costo.TotalServicio)}</td>
                 </tr>"));
         }

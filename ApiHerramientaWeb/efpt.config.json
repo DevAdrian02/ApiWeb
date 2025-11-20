@@ -284,6 +284,10 @@
          "ObjectType": 0
       },
       {
+         "Name": "[ORD].[trackingTecnico]",
+         "ObjectType": 0
+      },
+      {
          "Name": "[WEB].[AUDUSOP]",
          "ObjectType": 0
       },
@@ -325,6 +329,10 @@
       },
       {
          "Name": "[INV].[vwMovimientosEquiposListado]",
+         "ObjectType": 3
+      },
+      {
+         "Name": "[ORD].[VWContratoCliente]",
          "ObjectType": 3
       },
       {
