@@ -1,16 +1,17 @@
-﻿using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
-using System.Linq;
-using System.Collections.Generic;
-using System.Threading.Tasks;
+﻿using ApiHerramientaWeb.Controllers.Integraciones.Krill;
 using ApiHerramientaWeb.Controllers.Integraciones.SmartOlt;
-using ApiHerramientaWeb.Controllers.Integraciones.Krill;
+using ApiHerramientaWeb.Modelos;
+using ApiHerramientaWeb.Services;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
 using ModeloPrincipal.Entity;
+using System.Collections.Generic;
+using System.Diagnostics.Contracts;
+using System.Linq;
+using System.Threading.Tasks;
 using static ApiHerramientaWeb.Modelos.Operaciones.Estructuras.DatosOpe.cablemodems;
 using static System.Runtime.InteropServices.JavaScript.JSType;
-using ApiHerramientaWeb.Modelos;
-using Microsoft.Extensions.Configuration;
-using ApiHerramientaWeb.Services;
 
 namespace ApiHerramientaWeb.Controllers.Equipo.EstadoDispositivo
 {
@@ -22,6 +23,7 @@ namespace ApiHerramientaWeb.Controllers.Equipo.EstadoDispositivo
         private readonly KrillService _krillService;
         private readonly SmartOltService _smartOltService;
         private readonly SmartOltCatvService _smartOlCatvService;
+        private readonly MoviTvService _moviTvServices;
         private readonly ModemService _estadoModemService;
         private readonly Utils _utils;
         private readonly IDesactivarDispositivoService _desactivarDispositivoService;
@@ -33,6 +35,7 @@ namespace ApiHerramientaWeb.Controllers.Equipo.EstadoDispositivo
             KrillService krillService,
             SmartOltService smartOltService,
             SmartOltCatvService smartOlCatvService,
+            MoviTvService moviTvServices,
             ModemService estadoModemService,
             IDesactivarDispositivoService desactivarDispositivoService)
         {
@@ -41,6 +44,7 @@ namespace ApiHerramientaWeb.Controllers.Equipo.EstadoDispositivo
             _smartOltService = smartOltService;
             _utils = new Utils(_context, configuration);
             _smartOlCatvService = smartOlCatvService;
+            _moviTvServices = moviTvServices;
             _estadoModemService = estadoModemService;
             _desactivarDispositivoService = desactivarDispositivoService;
 
@@ -154,6 +158,8 @@ namespace ApiHerramientaWeb.Controllers.Equipo.EstadoDispositivo
             {
                 var query = await _estadoModemService.ObtenerQueryContrato(ideftocnt);
                 var contrato = query.FirstOrDefault();
+                var contratosConMoviTv = query.Where(c => c.id_servicio == 5).ToList();
+
 
                 if (contrato == null)
                     return Json(new { success = false, mensaje = "Contrato no encontrado" });
@@ -164,6 +170,27 @@ namespace ApiHerramientaWeb.Controllers.Equipo.EstadoDispositivo
                     return Json(new { success = false, mensaje = "Contrato solo contiene TV" });
 
                 }
+
+                if (contratosConMoviTv.Any())
+                {
+                    foreach (var contrato_ in contratosConMoviTv)
+                    {
+                        try
+                        {
+                            var partnerId = contrato_.CONTRATO.ToString();
+
+                            // Llamada a MoviTvService para suspender o desactivar
+                            await _moviTvServices.ActivarAsync(partnerId);
+
+                            Console.WriteLine($"Usuario MoviTV {partnerId} suspendido correctamente.");
+                        }
+                        catch (Exception ex)
+                        {
+                            Console.WriteLine($"Error al suspender MoviTV para {contrato.CONTRATO}: {ex.Message}");
+                        }
+                    }
+                }
+
 
 
 
@@ -210,6 +237,8 @@ namespace ApiHerramientaWeb.Controllers.Equipo.EstadoDispositivo
 
 
                     var resultado = await _desactivarDispositivoService.DesactivarCmInternoAsync(request,ip);
+
+
 
                     if (!resultado.Success)
                         return Json(new { success = false, mensaje = resultado.Mensaje });

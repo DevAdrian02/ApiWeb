@@ -14,4 +14,6 @@ public partial class VwcontratoCliente
     public string Name { get; set; }
 
     public string Direccion { get; set; }
+
+    public int? Idempresa { get; set; }
 }

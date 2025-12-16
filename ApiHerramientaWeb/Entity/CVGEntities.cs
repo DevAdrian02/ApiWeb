@@ -4621,6 +4621,9 @@ public partial class CVGEntities : DbContext
                 .HasComment("Identity de Compañía")
                 .HasColumnName("IDECIA");
             entity.Property(e => e.Idelibfac).HasColumnName("IDELIBFAC");
+            entity.Property(e => e.Idempresa)
+                .HasDefaultValue(1)
+                .HasColumnName("IDEmpresa");
             entity.Property(e => e.Idintegracion).HasColumnName("IDIntegracion");
             entity.Property(e => e.Idolt).HasColumnName("IDOLT");
             entity.Property(e => e.Latitud).HasColumnType("decimal(15, 13)");
@@ -6717,6 +6720,7 @@ public partial class CVGEntities : DbContext
                 .HasMaxLength(250)
                 .IsUnicode(false)
                 .HasColumnName("direccion");
+            entity.Property(e => e.Idempresa).HasColumnName("IDEmpresa");
             entity.Property(e => e.Mail)
                 .HasMaxLength(50)
                 .IsUnicode(false)

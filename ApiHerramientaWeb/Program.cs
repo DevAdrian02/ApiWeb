@@ -1,5 +1,6 @@
 ﻿using ApiHerramientaWeb.Controllers.Integraciones.Krill;
 using ApiHerramientaWeb.Controllers.Integraciones.SmartOlt;
+using ApiHerramientaWeb.Controllers.MoviTv;
 using ApiHerramientaWeb.Hubs;
 using ApiHerramientaWeb.Modelos;
 using ApiHerramientaWeb.Services;
@@ -75,6 +76,8 @@ builder.Services.AddScoped<ICatvService, SmartOltCatvService>();
 builder.Services.AddScoped<ConfiguracionEmail>();
 builder.Services.AddScoped<IPdfGeneratorService, PdfGeneratorService>();
 builder.Services.AddScoped<OrdenService>();
+builder.Services.AddScoped<MoviTvService>();
+builder.Services.AddScoped<MoviTVController>();
 
 builder.Services.AddScoped<IDesactivarDispositivoService, DesactivarDispositivoService>();
 builder.Services.AddScoped<Utils>(); // 👈 Agregá esto

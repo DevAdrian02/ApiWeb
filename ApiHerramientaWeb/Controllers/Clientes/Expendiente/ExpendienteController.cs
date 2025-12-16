@@ -126,6 +126,7 @@ namespace ApiHerramientaWeb.Controllers.Clientes.Expendiente
 
                 cliente.Celcli = request.Celcli;
                 cliente.Dircli010 = request.CpmText;
+                cliente.Email1 = request.Email; 
 
                 _context.Mstclis.Update(cliente);
 
@@ -146,12 +147,14 @@ namespace ApiHerramientaWeb.Controllers.Clientes.Expendiente
             public int Cpm { get; set; }         // Contrato
             public string CpmText { get; set; }  // Nueva dirección
             public string Celcli { get; set; }   // Nuevo celular
+            public string Email { get; set; }    // Nuevo email 
+
         }
 
         #endregion
 
 
 
- 
+
     }
 }

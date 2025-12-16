@@ -100,6 +100,8 @@ public partial class Mstsuc
 
     public decimal? Longitud { get; set; }
 
+    public int? Idempresa { get; set; }
+
     public virtual ICollection<Mstcli> Mstclis { get; set; } = new List<Mstcli>();
 
     public virtual ICollection<Mstlstpre> Mstlstpres { get; set; } = new List<Mstlstpre>();

@@ -130,6 +130,7 @@ namespace ApiHerramientaWeb.Controllers.MoviTv
                         c.Mail,
                         c.Name,
                         c.Direccion,
+                        c.Idempresa
                     })
                     .FirstOrDefaultAsync(cancellationToken);
 
