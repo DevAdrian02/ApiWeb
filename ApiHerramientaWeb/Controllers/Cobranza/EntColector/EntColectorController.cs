@@ -42,26 +42,28 @@ public class EntColectorController : Controller
             var parameters = new DynamicParameters();
             parameters.Add("@IdUsuario", idUsuario, DbType.Int32);
 
-            var rawData = await connection.QueryAsync(
-                sql: "CXC.spObtenerFacturasColector",
-                param: parameters,
-                commandTimeout: 120,
-                commandType: CommandType.StoredProcedure
+            var rawData = await connection.QueryAsync<FacturaColectorRaw>(
+                "CXC.spObtenerFacturasColector",
+                parameters,
+                commandType: CommandType.StoredProcedure,
+                commandTimeout: 120
             );
+
 
             var result = rawData?.Select(item => new FacturaColectorResponse
             {
                 id = item.IDContrato,
-                contrato = item.NoContrato ?? "N/A",
+                contrato = item.NoContrato ?? 0,
                 email1 = item.EMAIL1 ?? string.Empty,
                 email2 = item.EMAIL2 ?? string.Empty,
                 name = item.NOMFAC ?? string.Empty,
                 total = item.SALDO ?? 0m,
                 COD_STS = !string.IsNullOrEmpty(item.EstadoPagoFactura) ? item.EstadoPagoFactura : "S",
                 paymentDay = item.DiaPago ?? 0,
-                invoiceDate = item.FECHA ?? DateTime.MinValue, 
-                primeraMensualidad = item.PrimeraMensualidad ?? DateTime.MinValue,
+                invoiceDate = item.FECHA ?? DateTime.MinValue,
+                primeraMensualidad = Convert.ToBoolean(item.PrimeraMensualidad ?? false),
                 sucursal = item.Sucursal ?? "N/A",
+                idsucursal = item.IDSucursal,
                 faja = item.NumeroFaja ?? "N/A",
                 factura = item.Factura ?? "N/A",
                 idZona = item.IDEUBIGEO ?? 0,
@@ -74,7 +76,7 @@ public class EntColectorController : Controller
                     id = item.IDEUBIGEO ?? 0,
                     nombre = item.Zona ?? "Desconocido"
                 },
-                suspensionCompleto = Convert.ToBoolean(item.SuspensionCompleta ?? 0)
+                suspensionCompleto = Convert.ToBoolean(item.SuspensionCompleta ?? false)
             }).ToList() ?? new List<FacturaColectorResponse>();
 
 
