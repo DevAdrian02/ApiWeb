@@ -61,6 +61,55 @@ namespace ApiHerramientaWeb.Services
         }
 
 
+
+        //creacion de orden de rx de tap
+        public async Task<List<string>> CrearOrdenReconexionTapNapAsync(
+    int idecnt,
+    int idetecnico,
+    int idcuadrilla,
+    string usuario)
+        {
+            var mensajes = new List<string>();
+
+            using var connection = new SqlConnection(_connectionString);
+
+            // Captura los mensajes PRINT del SP (Ej: "Orden creada..." o "Servicio omitido...")
+            connection.InfoMessage += (sender, e) =>
+            {
+                mensajes.Add(e.Message);
+            };
+
+            // Apuntamos al nuevo SP que acabamos de crear
+            using var command = new SqlCommand("ORD.spOrdenReconexionTapNap", connection)
+            {
+                CommandType = CommandType.StoredProcedure
+            };
+
+            // Los parámetros coinciden con los del script SQL
+            command.Parameters.AddWithValue("@IDECNT", idecnt);
+            command.Parameters.AddWithValue("@IDETECASG", idetecnico);
+            command.Parameters.AddWithValue("@IDCUADRILLA", idcuadrilla);
+            command.Parameters.AddWithValue("@Usuario", usuario);
+
+            await connection.OpenAsync();
+
+            try
+            {
+                await command.ExecuteNonQueryAsync();
+            }
+            catch (SqlException ex)
+            {
+                mensajes.Add($"Error SQL: {ex.Message}");
+            }
+            catch (Exception ex)
+            {
+                mensajes.Add($"Error general: {ex.Message}");
+            }
+
+            return mensajes;
+        }
+
+
         public async Task<List<string>> CrearOrdenDesconexionAsync(int idecnt, int idetecasg, int idcuadrilla, string usuario)
         {
             var mensajes = new List<string>();

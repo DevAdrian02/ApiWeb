@@ -269,6 +269,36 @@ namespace ApiHerramientaWeb.Controllers.Ordenes
         }
 
 
+        [HttpPost("aperturarOrdenReconexion")]
+        public async Task<IActionResult> CrearOrdenReconexionTapNap([FromBody] CrearOrdenRequestModel request)
+        {
+            // 1️⃣ Obtener el CODUSR del usuario logueado (necesario para el SP)
+            var user = await _context.Mstusrs
+                .Where(c => c.Ideusr == request.Usuario)
+                .Select(c => new { c.Codusr })
+                .FirstOrDefaultAsync();
+
+            if (user == null)
+            {
+                return BadRequest(new { message = "No se encontró el usuario especificado." });
+            }
+
+            // 2️⃣ Llamar al repositorio (Método nuevo que acabamos de crear)
+            var result = await _repository.CrearOrdenReconexionTapNapAsync(
+                request.IDECNT,
+                request.IDETECAsg,
+                request.IDCUADRILLA,
+                user.Codusr
+            );
+
+            // 3️⃣ Responder con los mensajes del SP (PRINTs capturados)
+            return Ok(new
+            {
+                message = result
+            });
+        }
+
+
         [HttpPost("aperturarOrdenDesconexion")]
         public async Task<IActionResult> CrearOrdenDesconexion([FromBody] CrearOrdenDesconexionModel request)
         {

@@ -45,7 +45,7 @@
 
   <ItemGroup>
     <Reference Include="sifco.Security">
-      <HintPath>bin\sifco.Security.dll</HintPath>
+      <HintPath>..\..\sifco\sifco.Security.dll</HintPath>
     </Reference>
   </ItemGroup>
 
