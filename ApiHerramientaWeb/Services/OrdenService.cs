@@ -224,7 +224,13 @@ namespace ApiHerramientaWeb.Services
                         IdAuditoria = reader.GetInt32(reader.GetOrdinal("ID_AUDITORIA")),
                         IdUser = reader.GetInt32(reader.GetOrdinal("IDUSER")),
                         IdEtTicket = reader.GetInt32(reader.GetOrdinal("IDETTICKET")),
-                        Contrato = reader.GetInt32(reader.GetOrdinal("CONTRATO")),
+
+                        // 🔥 CORRECCIÓN AQUÍ:
+                        // 1. Leemos el dato como objeto/string (reader["CONTRATO"])
+                        // 2. Lo convertimos a String
+                        // 3. Lo parseamos a Int (usamos int.TryParse para que no truene si viene vacío o con letras)
+                        Contrato = int.TryParse(reader["CONTRATO"].ToString(), out int nContrato) ? nContrato : 0,
+
                         EstadoOrden = reader["ESTADO_ORDEN"].ToString() ?? string.Empty,
                         ResultadoVisita = reader["RESULTADO_VISITA"].ToString() ?? string.Empty,
                         FechaRegistro = reader.GetDateTime(reader.GetOrdinal("FECHA_REGISTRO"))
